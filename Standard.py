@@ -1,5 +1,5 @@
 import math
-pi2 = 2*math.pi
+pi2 = 2*3.14
 class Standard:
     def __init__(self, x, y, k) -> None:
         # x, y in [0,N], N = 16

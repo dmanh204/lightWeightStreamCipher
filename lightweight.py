@@ -47,10 +47,11 @@ class light:
         ret = sbox[hang*16 + cot]
         return ret
     def subByte(self, vector):
-        ret = []
-        for i in range(32):
-            ret.append(self.Sbox(vector[i]))
-        return ret
+        ret = map(self.Sbox,vector)
+        # ret = []
+        # for i in range(32):
+        #     ret.append(self.Sbox(vector[i]))
+        return list(ret) # cast ret thanh dang list
     # Ham standard su dung standard map de permute bit
     # Thu hien permute bit n = 10 lan
     def Stand(self, vector, rx, ry): # thuc hien voi list 32 phan tu
@@ -78,27 +79,34 @@ class light:
         return chiSo
     def swapBit(self, a, cot1, b, cot2):
         xa = cot1 %8
-        a1 = 0x01 << (7 - xa)
-        a1 = a1 & a # Lay duoc bit xa
-        a2 = 0xff&(-a1 -1) # nghich dao cua a1
-        a = a2 & a # Xoa bit xa cua a
+        xa = 7 - xa
+        # a1 = 0x01 << (7 - xa)
+        # a1 = a1 & a # Lay duoc bit xa
+        # a2 = 0xff&(-a1 -1) # nghich dao cua a1
+        # a = a2 & a # Xoa bit xa cua a
+        a1 = (a >> xa) & 1
 
         xb = cot2 %8
-        b1 = 0x01 << (7 - xb)
-        b1 = b1 & b # Lay duoc bit xb
-        b2 = 0xff & (-b1 - 1) # Nghich dao cua b1
-        b = b2 & b # Xoa bit xb cua a
+        xb = 7 - xb
+        # b1 = 0x01 << (7 - xb)
+        # b1 = b1 & b # Lay duoc bit xb
+        # b2 = 0xff & (-b1 - 1) # Nghich dao cua b1
+        # b = b2 & b # Xoa bit xb cua a
+        b1 = (b >> xb) & 1
+        x = a1 ^ b1 # xor 2 bit can swap
+        x1 = x << xa
+        x2 = x << xb
 
-        if xa < xb:
-            a1 = a1 >> (xb-xa)
-            b1 = b1 << (xb-xa)
-        elif xa > xb:
-            a1 = a1 << (xa-xb)
-            b1 = b1 >> (xa-xb)
+        # if xa < xb:
+        #     a1 = a1 >> (xb-xa)
+        #     b1 = b1 << (xb-xa)
+        # elif xa > xb:
+        #     a1 = a1 << (xa-xb)
+        #     b1 = b1 >> (xa-xb)
 
         # thuc hien dua bit a vao b va dua bit b vao a
-        a = a | b1
-        b = b | a1
+        a = a | x1
+        b = b | x2
         return a, b
     
     # Thu hien Mix Byte
@@ -140,8 +148,7 @@ class light:
         # a = v2[30], b= v2[31]
         v3 = self.mixByte(v2, v2[30], v2[31])
         # update self.vector cho lan lap sau
-        arr = []
-        for i in range(32):
-            self.vector[i] = v3[i]
-            arr.append(v3[i])
-        return arr
+        
+        self.vector= v3.copy()
+
+        return v3
